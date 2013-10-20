@@ -1,0 +1,40 @@
+ <!DOCTYPE html>
+<html>
+	<head>
+		<title>Sand Game</title>
+		<meta name="author" content="Ian Vamossy">
+		<link rel="stylesheet" type="text/css" href="style.css">
+	</head>
+	
+	<body>
+		<h1>Ian Vamossy - Welcome to Vamossy.com</h1>
+
+		<canvas id="myCanvas" width="800" height="600"></canvas>
+		<script>
+			var canvas = document.getElementById("myCanvas");
+			var context = canvas.getContext("2d");
+
+			const var GRAVITY = -9.8;
+
+			function drawSand(e){
+				var mousePos = getMousePos(canvas, e);
+				var mousePosX = mousePos.x;
+				var mousePosY = mousPos.y;
+
+				context.fillStyle = "#000000";
+				context.fillRect(mousePosX, mousePosY, 4, 4);
+			}
+
+			canvas.addEventListener('mousemove', drawSand, false);
+
+			function getMousePos(canvas, evt) {
+				var rect = canvas.getBoundingClientRect();
+				return {
+					x: evt.clientX - rect.left,
+					y: evt.clientY - rect.top
+				};
+			}
+		</script>
+	</body>
+</html>
+
