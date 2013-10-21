@@ -9,23 +9,32 @@
 	<body>
 		<h1>Ian Vamossy - Welcome to Vamossy.com</h1>
 
-		<canvas id="myCanvas" width="800" height="600"></canvas>
+		<canvas id="myCanvas" width="800" height="600">Your browser does not support HTML5.</canvas>
 		<script>
 			var canvas = document.getElementById("myCanvas");
 			var context = canvas.getContext("2d");
 
-			const var GRAVITY = -9.8;
+			var GRAVITY = -9.8;
 
-			function drawSand(e){
+			window.requestAnimFrame = (function(callback) {
+				return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+				function(callback) {
+					window.setTimeout(callback, 1000 / 60);
+				};
+			})();
+
+			function createSand(e){
 				var mousePos = getMousePos(canvas, e);
 				var mousePosX = mousePos.x;
-				var mousePosY = mousPos.y;
+				var mousePosY = mousePos.y;
+
+				//canvas.addEventListener('mousemove', createSand, false);
 
 				context.fillStyle = "#000000";
 				context.fillRect(mousePosX, mousePosY, 4, 4);
 			}
 
-			canvas.addEventListener('mousemove', drawSand, true);
+			canvas.addEventListener('mousedown', createSand, false);
 
 			function getMousePos(canvas, evt) {
 				var rect = canvas.getBoundingClientRect();
@@ -33,6 +42,29 @@
 					x: evt.clientX - rect.left,
 					y: evt.clientY - rect.top
 				};
+			}
+
+			function animate(myRectangle, canvas, context, startTime) {
+				// update
+				var time = (new Date()).getTime() - startTime;
+
+				var linearSpeed = 100;
+				// pixels / second
+				var newX = linearSpeed * time / 1000;
+
+				if(newX < canvas.width - myRectangle.width - myRectangle.borderWidth / 2) {
+					myRectangle.x = newX;
+				}
+
+				// clear
+				context.clearRect(0, 0, canvas.width, canvas.height);
+
+				drawRectangle(myRectangle, context);
+
+				// request new frame
+				requestAnimFrame(function() {
+					animate(myRectangle, canvas, context, startTime);
+				});
 			}
 		</script>
 	</body>
