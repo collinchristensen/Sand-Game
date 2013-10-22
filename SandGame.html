@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<title>Sand Game</title>
+		// <meta charset="UTF-8">
 		<meta name="author" content="Ian Vamossy">
 		<link rel="stylesheet" type="text/css" href="style.css">
 	</head>
@@ -9,15 +10,13 @@
 	<body>
 		<h1>Ian Vamossy - Welcome to Vamossy.com</h1>
 
-		<canvas id="myCanvas" width="800" height="600">Your browser does not support HTML5.</canvas>
+		<canvas id="myCanvas" width="800" height="600">Your browser does not support HTML5. Please update to a more modern browser.</canvas>
 		<script>
 			var canvas = document.getElementById("myCanvas");
 			var context = canvas.getContext("2d");
-			var GRAVITY = 9.8;
+			var GRAVITY = 4;
 
 			var sand = {
-				x: 0,
-				y: 0,
 				width: 2,
 				height: 2
 			};
@@ -28,6 +27,14 @@
 					window.setTimeout(callback, 1000 / 60);
 				};
 			})();
+
+			function getMousePos(canvas, evt) {
+				var rect = canvas.getBoundingClientRect();
+				return {
+					x: evt.clientX - rect.left,
+					y: evt.clientY - rect.top
+				};
+			}
 
 			function drawSand(sand, context) {
 				context.beginPath();
@@ -46,7 +53,6 @@
 
 				//canvas.addEventListener('mousemove', createSand, false);
 
-				// wait one second before starting animation
 				setTimeout(function() {
 					var startTime = (new Date()).getTime();
 					animate(sand, canvas, context, startTime);
@@ -54,15 +60,7 @@
 			}
 
 			//Add sand event listener
-			canvas.addEventListener('mousedown', createSand, false);
-
-			function getMousePos(canvas, evt) {
-				var rect = canvas.getBoundingClientRect();
-				return {
-					x: evt.clientX - rect.left,
-					y: evt.clientY - rect.top
-				};
-			}
+			canvas.addEventListener('mouse', createSand, false);
 
 			function animate(sand, canvas, context, startTime) {
 				// update
@@ -71,10 +69,10 @@
 				// pixels / second
 				var linearSpeed = GRAVITY;
 
-				var newY = sand.y + (linearSpeed * time / 1000);
+				var newY = (linearSpeed * time / 1000);
 
 				if(newY < canvas.height - sand.height) {
-					sand.y = newY;
+					sand.y += newY;
 				}
 
 				// clear
@@ -85,7 +83,7 @@
 
 				// request new frame
 				requestAnimFrame(function() {
-					animate(sand, canvas, context, startTime);
+					animate(sand, canvas, context, time);
 				});
 			}
 		</script>
