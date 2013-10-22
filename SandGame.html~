@@ -37,9 +37,10 @@
 			}
 
 			function drawSand(sand, context) {
-				//context.beginPath();
+				context.beginPath();
+				context.rect(sand.x, sand.y, sand.width, sand.height);
 				context.fillStyle = '#000000';
-				context.fillRect(sand.x, sand.y, sand.width, sand.height);
+				context.fill();
 			}
 
 			function createSand(e){
@@ -52,14 +53,12 @@
 
 				//canvas.addEventListener('mousemove', createSand, false);
 
-				setTimeout(function() {
-					var startTime = (new Date()).getTime();
-					animate(myRectangle, canvas, context, startTime);
-				}, 1000);
+				var startTime = (new Date()).getTime();
+				animate(sand, canvas, context, startTime);
 			}
 
 			//Add sand event listener
-			canvas.addEventListener('mouse', createSand, false);
+			canvas.addEventListener('mousedown', createSand, false);
 
 			function animate(sand, canvas, context, startTime) {
 				// update
