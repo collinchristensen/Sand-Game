@@ -9,6 +9,12 @@ body
 background-color:#ffffff;
 }
 
+#canvas-container {
+   padding-top:20px;
+   width: 100%;
+   text-align:center;
+}
+
 h1
 {
 font-size: 48pt;

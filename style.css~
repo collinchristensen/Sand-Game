@@ -6,7 +6,13 @@ src: url('fonts/Roboto-Thin.ttf');
 
 body
 {
-background-color:#35D2AB;
+background-color:#ffffff;
+}
+
+#canvas-container {
+   padding-top:20px;
+   width: 100%;
+   text-align:center;
 }
 
 h1

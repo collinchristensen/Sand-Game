@@ -2,15 +2,19 @@
 <html>
 	<head>
 		<title>Sand Game</title>
-		// <meta charset="UTF-8">
+		<meta charset="UTF-8">
 		<meta name="author" content="Ian Vamossy">
 		<link rel="stylesheet" type="text/css" href="style.css">
 	</head>
 	
 	<body>
 		<h1>Ian Vamossy - Welcome to Vamossy.com</h1>
+		<h2>Powder Game HTML5 Clone (WIP)</h2>
+		
+		<div id="canvas-container">
+			<canvas id="myCanvas" width="800" height="600">Your browser does not support HTML5. Please update to a more modern browser.</canvas>
+		</div>
 
-		<canvas id="myCanvas" width="800" height="600">Your browser does not support HTML5. Please update to a more modern browser.</canvas>
 		<script>
 			var canvas = document.getElementById("myCanvas");
 			var context = canvas.getContext("2d");
