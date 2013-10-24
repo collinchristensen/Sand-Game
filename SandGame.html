@@ -15,86 +15,105 @@
 			<canvas id="myCanvas" width="800" height="600">Your browser does not support HTML5. Please update to a more modern browser.</canvas>
 		</div>
 
+		<script src="scripts/stats.min.js"></script>
+
 		<script>
 			var canvas = document.getElementById("myCanvas");
 			var context = canvas.getContext("2d");
-			context.fillStyle = '#000000';
-			context.fillRect(0, 0, canvas.width, canvas.height);
-				
-			var GRAVITY = 10;
+			var stats = new Stats();
+			stats.setMode(0); // 0: fps, 1: ms
 
-			var sand = {
-				width: 2,
-				height: 2
-			};
+			// Align top-left
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.left = '0px';
+			stats.domElement.style.top = '0px';
 
-			window.requestAnimFrame = (function(callback) {
-				return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
-				function(callback) {
-					window.setTimeout(callback, 1000 / 60);
-				};
-			})();
+			document.body.appendChild( stats.domElement );
 
-			function getMousePos(canvas, evt) {
-				var rect = canvas.getBoundingClientRect();
-				return {
-					x: evt.clientX - rect.left,
-					y: evt.clientY - rect.top
-				};
-			}
+			setInterval( function () {
 
-			function drawSand(sand, context) {
-				context.beginPath();
-				context.rect(sand.x, sand.y, sand.width, sand.height);
-				context.fillStyle = '#ffffff';
-				context.fill();
+				stats.begin();
 
-				//context.fillRect(sand.x, sand.y, sand.width, sand.height);
-				//context.fillStyle = '#000000';
-			}
-
-			function createSand(e){
-				var mousePos = getMousePos(canvas, e);
-				sand.x = mousePos.x;
-				sand.y = mousePos.y;
-
-				//First draw of sand rectangle
-				drawSand(sand, context);
-
-				//canvas.addEventListener('mousemove', createSand, false);
-
-				var startTime = (new Date()).getTime();
-				animate(sand, canvas, context, startTime, true);
-			}
-
-			//Add sand event listener
-			canvas.addEventListener('mousedown', createSand, false);
-
-			function animate(sand, canvas, context, startTime, isNewSand) {
-				// update elapsed time
-				var time = (new Date()).getTime() - startTime;
-
-				// pixels / second
-				var linearSpeed = GRAVITY;
-
-				var newY = (linearSpeed * time / 1000);
-
-				if(newY < canvas.height - sand.height) {
-					sand.y += newY;
-				}
-
-				// clear
 				context.fillStyle = '#000000';
 				context.fillRect(0, 0, canvas.width, canvas.height);
+				
+				var GRAVITY = 4;
 
-				//Redraw sand every animation frame, reset startTime
-				drawSand(sand, context);
+				var sand = {
+					width: 2,
+					height: 2
+				};
 
-				// request new frame
-				requestAnimFrame(function() {
-					animate(sand, canvas, context, startTime, false);
-				});
-			}
+				window.requestAnimFrame = (function(callback) {
+					return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+					function(callback) {
+						window.setTimeout(callback, 1000 / 60);
+					};
+				})();
+
+				function getMousePos(canvas, evt) {
+					var rect = canvas.getBoundingClientRect();
+					return {
+						x: evt.clientX - rect.left,
+						y: evt.clientY - rect.top
+					};
+				}
+
+				function drawSand(sand, context, posX, posY) {
+					context.beginPath();
+					context.rect(posX, posY, sand.width, sand.height);
+					context.fillStyle = '#ffffff';
+					context.fill();
+
+					//context.fillRect(sand.x, sand.y, sand.width, sand.height);
+					//context.fillStyle = '#000000';
+				}
+
+				function createSand(e){
+					var mousePos = getMousePos(canvas, e);
+
+					//First draw of sand rectangle
+					drawSand(sand, context, mousePos.x, mousePos.y);
+
+					//canvas.addEventListener('mousemove', createSand, false);
+
+					var startTime = (new Date()).getTime();
+					animate(sand, canvas, context, startTime, mousePos.x, mousePos.y);
+				}
+
+				//Add sand event listener
+				canvas.addEventListener('mousedown', createSand, false);
+
+				function animate(sand, canvas, context, startTime, posX, posY) {
+					// update elapsed time
+					var time = (new Date()).getTime() - startTime;
+
+					// pixels / second
+					var linearSpeed = GRAVITY;
+
+					var originalY = posY;
+					var newY = (linearSpeed * time / 1000);
+
+					if(newY < canvas.height - sand.height) {
+						posY = originalY + newY;
+					}
+
+					// clear
+					context.fillStyle = '#000000';
+					context.fillRect(0, 0, canvas.width, canvas.height);
+
+					//Redraw sand every animation frame, reset startTime
+					drawSand(sand, context, posX, originalY + newY);
+
+					// request new frame
+					requestAnimFrame(function() {
+						animate(sand, canvas, context, startTime, false);
+					});
+				}
+
+				stats.end();
+
+			}, 1000 / 60 );
 		</script>
 	</body>
 </html>
