@@ -24,9 +24,22 @@
 			stats.setMode(0); // 0: fps, 1: ms
 
 			// Align top-left
+			function getPosition(element) {
+				var xPosition = 0;
+				var yPosition = 0;
+
+				while(element) {
+					xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
+					yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
+					element = element.offsetParent;
+				}
+
+				return { x: xPosition, y: yPosition };
+			}
+
 			stats.domElement.style.position = 'absolute';
-			stats.domElement.style.left = '0px';
-			stats.domElement.style.top = '0px';
+			stats.domElement.style.left = getPosition(canvas).x + 'px';
+			stats.domElement.style.top = getPosition(canvas).y + 'px';
 
 			document.body.appendChild( stats.domElement );
 
@@ -38,11 +51,7 @@
 				context.fillRect(0, 0, canvas.width, canvas.height);
 				
 				var GRAVITY = 4;
-
-				var sand = {
-					width: 2,
-					height: 2
-				};
+				var sand = new Sand(context);
 
 				window.requestAnimFrame = (function(callback) {
 					return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
@@ -59,32 +68,42 @@
 					};
 				}
 
-				function drawSand(sand, context, posX, posY) {
-					context.beginPath();
-					context.rect(posX, posY, sand.width, sand.height);
-					context.fillStyle = '#ffffff';
-					context.fill();
+				function Sand(context) {
+					var width = 2;
+					var height = 2;
+					var posX = "Uninitialized";
+					var posY = "Uninitialized";
 
-					//context.fillRect(sand.x, sand.y, sand.width, sand.height);
-					//context.fillStyle = '#000000';
-				}
+					this.create = new function(e){
+						var mousePos = getMousePos(canvas, e);
+						posX = mousePos.x;
+						posY = mousePos.y;
 
-				function createSand(e){
-					var mousePos = getMousePos(canvas, e);
+						context.beginPath();
+						context.rect(posX, posY, width, height);
+						context.fillStyle = '#ffffff';
+						context.fill();
 
-					//First draw of sand rectangle
-					drawSand(sand, context, mousePos.x, mousePos.y);
+						var startTime = (new Date()).getTime();
+						animate(sand, canvas, context, startTime, mousePos.x, mousePos.y);
+					}
 
-					//canvas.addEventListener('mousemove', createSand, false);
+					this.redraw = new function(newX, newY){
+					}
 
-					var startTime = (new Date()).getTime();
-					animate(sand, canvas, context, startTime, mousePos.x, mousePos.y);
+					this.getX = function(){
+						return posX;
+					}
+	
+					this.getY = function(){
+						return posY;
+					}
 				}
 
 				//Add sand event listener
-				canvas.addEventListener('mousedown', createSand, false);
+				canvas.addEventListener('mousedown', Sand.create, false);
 
-				function animate(sand, canvas, context, startTime, posX, posY) {
+				function animate(sand, canvas, context, startTime) {
 					// update elapsed time
 					var time = (new Date()).getTime() - startTime;
 
