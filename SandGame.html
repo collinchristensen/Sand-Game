@@ -51,7 +51,6 @@
 				context.fillRect(0, 0, canvas.width, canvas.height);
 				
 				var GRAVITY = 4;
-				var sand = new Sand(context);
 
 				window.requestAnimFrame = (function(callback) {
 					return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
@@ -68,16 +67,16 @@
 					};
 				}
 
-				function Sand(context) {
+				function Sand(context, evt) {
 					var width = 2;
 					var height = 2;
 					var posX = "Uninitialized";
 					var posY = "Uninitialized";
 
-					this.create = new function(e){
-						var mousePos = getMousePos(canvas, e);
-						posX = mousePos.x;
-						posY = mousePos.y;
+					this.create = new function(x, y, evt){
+						canvas.addEventListener('click', getMousePos, false);
+						posX = getMousePos.x;
+						posY = getMousePos.y;
 
 						context.beginPath();
 						context.rect(posX, posY, width, height);
@@ -85,10 +84,22 @@
 						context.fill();
 
 						var startTime = (new Date()).getTime();
-						animate(sand, canvas, context, startTime, mousePos.x, mousePos.y);
+						animate(this, canvas, context, startTime);
 					}
 
-					this.redraw = new function(newX, newY){
+					function redraw(newY){
+						context.beginPath();
+						context.rect(posX, newY, width, height);
+						context.fillStyle = '#ffffff';
+						context.fill();
+					}
+
+					this.getWidth = function(){
+						return width;
+					}
+	
+					this.getHeight = function(){
+						return height;
 					}
 
 					this.getX = function(){
@@ -101,7 +112,8 @@
 				}
 
 				//Add sand event listener
-				canvas.addEventListener('mousedown', Sand.create, false);
+				var sand = new Sand(context);
+				canvas.addEventListener('click', sand.create, false);
 
 				function animate(sand, canvas, context, startTime) {
 					// update elapsed time
@@ -109,12 +121,13 @@
 
 					// pixels / second
 					var linearSpeed = GRAVITY;
+					var newY;
 
-					var originalY = posY;
-					var newY = (linearSpeed * time / 1000);
+					var originalY = sand.getY;
+					var distanceTravelled = (linearSpeed * time / 1000);
 
-					if(newY < canvas.height - sand.height) {
-						posY = originalY + newY;
+					if(distanceTravelled < canvas.height - sand.getHeight) {
+						newY = originalY + distanceTravelled;
 					}
 
 					// clear
@@ -122,11 +135,11 @@
 					context.fillRect(0, 0, canvas.width, canvas.height);
 
 					//Redraw sand every animation frame, reset startTime
-					drawSand(sand, context, posX, originalY + newY);
+					sand.redraw(newY);
 
 					// request new frame
 					requestAnimFrame(function() {
-						animate(sand, canvas, context, startTime, false);
+						animate(sand, canvas, context, startTime);
 					});
 				}
 
