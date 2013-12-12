@@ -49,8 +49,11 @@
 
 				context.fillStyle = '#000000';
 				context.fillRect(0, 0, canvas.width, canvas.height);
-				
+				canvas.addEventListener('mousedown', getMousePos, false);
 				var GRAVITY = 4;
+				var posX = "Uninitialized";
+				var posY = "Uninitialized";
+				
 
 				window.requestAnimFrame = (function(callback) {
 					return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
@@ -59,34 +62,39 @@
 					};
 				})();
 
-				function getMousePos(canvas, evt) {
-					var rect = canvas.getBoundingClientRect();
-					return {
-						x: evt.clientX - rect.left,
-						y: evt.clientY - rect.top
-					};
+				function getMousePos(event) {
+					var totalOffsetX = 0;
+					var totalOffsetY = 0;
+					var canvasX = 0;
+					var canvasY = 0;
+					var currentElement = this;
+
+					do{
+						totalOffsetX += currentElement.offsetLeft - currentElement.scrollLeft;
+						totalOffsetY += currentElement.offsetTop - currentElement.scrollTop;
+					}
+					while(currentElement = currentElement.offsetParent)
+
+					posX = event.pageX - totalOffsetX;
+					posY = event.pageY - totalOffsetY;
 				}
 
-				function Sand(context, evt) {
+				function Sand(context) {
 					var width = 2;
 					var height = 2;
-					var posX = "Uninitialized";
-					var posY = "Uninitialized";
-
-					this.create = new function(x, y, evt){
-						canvas.addEventListener('click', getMousePos, false);
-						posX = getMousePos.x;
-						posY = getMousePos.y;
-
+					
+					this.create = create;
+					function create(){
 						context.beginPath();
 						context.rect(posX, posY, width, height);
 						context.fillStyle = '#ffffff';
 						context.fill();
 
 						var startTime = (new Date()).getTime();
-						animate(this, canvas, context, startTime);
+						//animate(this, canvas, context, startTime);
 					}
 
+					this.redraw = redraw;
 					function redraw(newY){
 						context.beginPath();
 						context.rect(posX, newY, width, height);
@@ -113,7 +121,8 @@
 
 				//Add sand event listener
 				var sand = new Sand(context);
-				canvas.addEventListener('click', sand.create, false);
+				canvas.addEventListener('mousedown', sand.create, false);
+				animate(sand, canvas, context, sand.startTime);
 
 				function animate(sand, canvas, context, startTime) {
 					// update elapsed time
